@@ -25,9 +25,8 @@ jobs:
           playwright install chromium
 
       - name: Run TAF 5G product checker
-        run: python your_script_name.py
+        run: python taf_5g_monitor.py
 
-      # Optional: Commit updated JSON file if changed
       - name: Commit and push changes
         if: success()
         run: |
@@ -37,5 +36,4 @@ jobs:
           git diff --cached --quiet || git commit -m "Update TAF 5G products data"
           git push
         env:
-          # Needed if you want to push changes back to the repo
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
