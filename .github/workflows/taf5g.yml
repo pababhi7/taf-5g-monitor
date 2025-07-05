@@ -27,13 +27,17 @@ jobs:
       - name: Run TAF 5G product checker
         run: python taf_monitor.py
 
+      - name: Print last 5 devices
+        run: |
+          python -c "import json; d=json.load(open('taf_5g_products.json', encoding='utf-8')); print('\n\n'.join(map(str, d[-5:])))"
+
       - name: Commit and push changes
         if: success()
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
           git add taf_5g_products.json
-          git diff --cached --quiet || git commit -m "Update TAF 5G products data"
+          git diff --cached --quiet || git commit -m 'Update TAF 5G products data'
           git push
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
