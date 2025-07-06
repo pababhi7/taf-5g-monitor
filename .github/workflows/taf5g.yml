@@ -1,43 +1,19 @@
-name: Check TAF 5G Products
-
-on:
-  schedule:
-    - cron: '0 2 * * *'  # Runs every day at 02:00 UTC
-  workflow_dispatch:      # Allows manual trigger
-
-jobs:
-  taf5g:
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.10'
-
-      - name: Install dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install -r requirements.txt
-          playwright install chromium
-
-      - name: Run TAF 5G product checker
-        run: python taf_monitor.py
-
       - name: Print last 5 devices
         run: |
-          python -c "import json; d=json.load(open('taf_5g_products.json', encoding='utf-8')); print('\n\n'.join(map(str, d[-5:])))"
-
-      - name: Commit and push changes
-        if: success()
-        run: |
-          git config --global user.name "github-actions[bot]"
-          git config --global user.email "github-actions[bot]@users.noreply.github.com"
-          git add taf_5g_products.json
-          git diff --cached --quiet || git commit -m 'Update TAF 5G products data'
-          git push
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          python -c "
+import json
+from datetime import datetime
+with open('taf_5g_products.json', encoding='utf-8') as f:
+    d = json.load(f)
+try:
+    # Adjust the date format below if needed!
+    d_sorted = sorted(d, key=lambda x: datetime.strptime(x[-1].strip(), '%Y-%m-%d'), reverse=True)
+    for prod in d_sorted[:5]:
+        print(prod)
+        print()
+except Exception as e:
+    print('Error sorting products by date:', e)
+    for prod in d[-5:]:
+        print(prod)
+        print()
+"
