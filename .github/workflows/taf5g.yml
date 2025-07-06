@@ -2,7 +2,7 @@ name: Check TAF 5G Products
 
 on:
   schedule:
-    - cron: '0 2 * * *'  # Runs every day at 02:00 UTC
+    - cron: '0 2 * * *'
   workflow_dispatch:
 
 jobs:
@@ -29,11 +29,13 @@ jobs:
 
       - name: Print last 5 devices
         run: |
-          python -c "
+          python <<EOF
 import json
 from datetime import datetime
+
 with open('taf_5g_products.json', encoding='utf-8') as f:
     d = json.load(f)
+
 try:
     d_sorted = sorted(d, key=lambda x: datetime.strptime(x[-1].strip(), '%Y-%m-%d'), reverse=True)
     for prod in d_sorted[:5]:
@@ -44,7 +46,7 @@ except Exception as e:
     for prod in d[-5:]:
         print(prod)
         print()
-"
+EOF
 
       - name: Commit and push changes
         if: success()
