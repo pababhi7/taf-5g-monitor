@@ -36,14 +36,17 @@ jobs:
           with open('taf_5g_products.json', encoding='utf-8') as f:
               d = json.load(f)
 
+          # Filter for 5G devices (searches all fields in each row)
+          five_g_devices = [prod for prod in d if any('5G' in str(field) for field in prod)]
+
           try:
-              d_sorted = sorted(d, key=lambda x: datetime.strptime(x[-1].strip(), '%Y-%m-%d'), reverse=True)
+              d_sorted = sorted(five_g_devices, key=lambda x: datetime.strptime(x[-1].strip(), '%Y-%m-%d'), reverse=True)
               for prod in d_sorted[:5]:
                   print(prod)
                   print()
           except Exception as e:
               print('Error sorting products by date:', e)
-              for prod in d[-5:]:
+              for prod in five_g_devices[-5:]:
                   print(prod)
                   print()
           EOF
